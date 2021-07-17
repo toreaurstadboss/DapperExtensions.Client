@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using ToreAurstadIT.DapperUtils;
 
 namespace DapperExtensions.Client
 {
@@ -30,12 +31,18 @@ namespace DapperExtensions.Client
              (Product p, Category c) => p.CategoryID == c.CategoryID,
              (Product p, Supplier s) => p.SupplierID == s.SupplierID);
             dynamic firstRow = joinedproductsandcategory.ElementAt(0);
+       
+            Assert.AreEqual(firstRow.EmployeeID + firstRow.Title + firstRow.OrderID + firstRow.ShipName + firstRow.ProductID.ToString() + firstRow.ProductName + firstRow.CategoryID + firstRow.CategoryName + firstRow.SupplierID + firstRow.CompanyName, "5Sales Manager10248Vins et alcools Chevalier11Queso Cabrales4Dairy Products5Cooperativa de Quesos 'Las Cabras'");
+      
+            var filteredJoindProductsAndCategory = Connection.InnerJoin((Product p, Category c) => p.CategoryID == c.CategoryID,
+                new Tuple<string, Type>[] { new Tuple<string, Type>("CategoryID=5", typeof(Category)) });
+
+            dynamic firstRowFiltered = filteredJoindProductsAndCategory;
+            Assert.AreEqual(firstRow.EmployeeID + firstRow.Title + firstRow.OrderID + firstRow.ShipName + firstRow.ProductID.ToString() + firstRow.ProductName + firstRow.CategoryID + firstRow.CategoryName + firstRow.SupplierID + firstRow.CompanyName, "5Sales Manager10248Vins et alcools Chevalier11Queso Cabrales4Dairy Products5Cooperativa de Quesos 'Las Cabras'");
 
             Connection.Close();
             Connection.Dispose();
             Connection = null;
-
-            Assert.AreEqual(firstRow.EmployeeID + firstRow.Title + firstRow.OrderID + firstRow.ShipName + firstRow.ProductID.ToString() + firstRow.ProductName + firstRow.CategoryID + firstRow.CategoryName + firstRow.SupplierID + firstRow.CompanyName, "5Sales Manager10248Vins et alcools Chevalier11Queso Cabrales4Dairy Products5Cooperativa de Quesos 'Las Cabras'");
         }
 
         private static IConfigurationRoot SetupConfigurationFile()
